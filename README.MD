@@ -50,16 +50,28 @@ Example data can be seen in [Process/jokowi_twitterACC](Process/jokowi_twitterAC
     pip install -r requirements.txt
 	```
 
-## Usage`
+## Usage
+You can use the scraper in two ways:
+
+### 1) Run the notebook (existing workflow)
 The main notebook is [Notebook.IPYNB](Notebook.IPYNB). It contains:
 - The `twitterScrapper` class (imported from [src.py](src.py))
 - Examples of filter configuration
 - Example `session.start(...)` calls
 
 Quick flow:
-1. Open the notebook
-2. Update filters
-3. Run the scraping cell
+1. Install dependencies: `pip install -r requirements.txt`
+2. Open the notebook
+3. Update filters
+4. Run the scraping cell
+
+### 2) Use the desktop app (release build)
+Download the latest app from the Releases page and run it directly.
+
+Quick flow:
+1. Download the latest release
+2. Launch the app
+3. Select credentials, configure filters, and start scraping
 
 ### Filter Options
 Refer to [X Advanced Search](https://x.com/search-advanced) for filter explanations. Example filter configuration:
