@@ -9,7 +9,7 @@ from IPython.display import clear_output
 import shutil
 from datetime import datetime, timedelta
 import warnings
-
+import random as rd
 # Scrapping and crawling modules
 import undetected_chromedriver as uc
 from requests.utils import quote, unquote
@@ -17,6 +17,51 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException,
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+
+
+lang_codes = {'Arabic': 'ar',
+            'Arabic (Feminine)': 'ar-x-fm',
+            'Bangla': 'bn',
+            'Basque': 'eu',
+            'Bulgarian': 'bg',
+            'Catalan': 'ca',
+            'Croatian': 'hr',
+            'Czech': 'cs',
+            'Danish': 'da',
+            'Dutch': 'nl',
+            'English': 'en',
+            'Finnish': 'fi',
+            'French': 'fr',
+            'German': 'de',
+            'Greek': 'el',
+            'Gujarati': 'gu',
+            'Hebrew': 'he',
+            'Hindi': 'hi',
+            'Hungarian': 'hu',
+            'Indonesian': 'id',
+            'Italian': 'it',
+            'Japanese': 'ja',
+            'Kannada': 'kn',
+            'Korean': 'ko',
+            'Marathi': 'mr',
+            'Norwegian': 'no',
+            'Persian': 'fa',
+            'Polish': 'pl',
+            'Portuguese': 'pt',
+            'Romanian': 'ro',
+            'Russian': 'ru',
+            'Serbian': 'sr',
+            'Simplified Chinese': 'zh-cn',
+            'Slovak': 'sk',
+            'Spanish': 'es',
+            'Swedish': 'sv',
+            'Tamil': 'ta',
+            'Thai': 'th',
+            'Traditional Chinese': 'zh-tw',
+            'Turkish': 'tr',
+            'Ukrainian': 'uk',
+            'Urdu': 'ur',
+            'Vietnamese': 'vi'}
 
 def getTime(str: str) -> datetime:
     '''
@@ -421,7 +466,11 @@ class twitterScrapper:
 
         # Login handling
         WebDriverWait(self.driver, 30).until(EC.presence_of_element_located((By.XPATH, "//input[@autocomplete = 'username']")))
-        self.driver.find_element(By.XPATH, "//input[@autocomplete = 'username']").send_keys(self.username)
+        time.sleep(3)
+        username_input = self.driver.find_element(By.XPATH, "//input[@autocomplete = 'username']")
+        for i in self.username:
+            username_input.send_keys(i)
+            time.sleep(rd.uniform(0.05, 0.2))
         self.driver.find_element(By.XPATH, "//div/button[2]").click()
         time.sleep(5)
 
@@ -431,14 +480,20 @@ class twitterScrapper:
                 print("Suspicious login attempt detected, attempting to enter email on login prochedures.")
                 if self.email is None:
                     raise ValueError("Email is required due to suspicious login attempt, but email is not provided on credentials!")
-                self.driver.find_element(By.XPATH, "//input").send_keys(self.email)
+                email_input = self.driver.find_element(By.XPATH, "//input")
+                for i in self.email:
+                    email_input.send_keys(i)
+                    time.sleep(rd.uniform(0.05, 0.2))
                 self.driver.find_element(By.XPATH, "//div[2]/div/div/div/button").click()
         except:
             pass
 
         # Put password
         WebDriverWait(self.driver, 30).until(EC.presence_of_element_located((By.XPATH, "//input[@name='password']")))
-        self.driver.find_element(By.XPATH, "//input[@name='password']").send_keys(self.password)
+        password_input = self.driver.find_element(By.XPATH, "//input[@name='password']")
+        for i in self.password:
+            password_input.send_keys(i)
+            time.sleep(rd.uniform(0.05, 0.2))
         self.driver.find_element(By.XPATH, "//button[@data-testid='LoginForm_Login_Button']").click()
         time.sleep(5)
 
@@ -469,7 +524,8 @@ class twitterScrapper:
                 "these_hashtags": "", 
                 "from_accounts": "",            
                 "to_accounts": "",              
-                "mentioning_accounts": "",      
+                "mentioning_accounts": "",
+                "language": "",   
                 "Minimum_replies": "",
                 "Minimum_likes": "",
                 "Minimum_retweets": "",
@@ -552,6 +608,7 @@ class twitterScrapper:
         filters["to_accounts"] = f'({" OR ".join(f"to:{i}" for i in filters["to_accounts"].split())})' if filters["to_accounts"] != "" else ""
         filters["mentioning_accounts"] = f'({" OR ".join(f"@{i}" for i in filters["mentioning_accounts"].split())})' if filters["mentioning_accounts"] != "" else ""
 
+        filters["language"] = f'lang:{lang_codes[filters["language"]]}' if filters["language"] != "" else ""
         filters["replies"] = "" if filters["replies"] else "-filter:replies" 
         filters["links"] = "" if filters["links"] else "-filter:links"
 

@@ -25,7 +25,7 @@ Example data can be seen in [Process/jokowi_twitterACC](Process/jokowi_twitterAC
 
 ## Requirements
 - Python 3.9+
-- Google Chrome installed
+- Google Chrome installed, preferably version 144.
 
 ## Setup
 1. Clone the repository:
@@ -51,8 +51,8 @@ Example data can be seen in [Process/jokowi_twitterACC](Process/jokowi_twitterAC
 	```
 
 ## Usage
-The main notebook is [SRC.IPYNB](SRC.IPYNB). It contains:
-- The `twitterScrapper` class
+The main notebook is [Notebook.IPYNB](Notebook.IPYNB). It contains:
+- The `twitterScrapper` class (imported from [src.py](src.py))
 - Examples of filter configuration
 - Example `session.start(...)` calls
 
@@ -96,9 +96,9 @@ By default, outputs are stored in:
 - Final CSV/JSON on completion
 
 ## Project Structure
-- [SRC.IPYNB](SRC.IPYNB): main implementation + usage
-- [Debug.ipynb](Debug.ipynb): debugging and testing, useful if you want to modify the code and test it
-- [Requirements.txt](Requirements.txt): dependencies
+- [src.py](src.py): main implementation
+- [Notebook.IPYNB](Notebook.IPYNB): main notebook for running the scraper
+- [requirements.txt](requirements.txt): dependencies
 - [Credentials](Credentials): Credentials storage
 - [Process](Process): runtime outputs and savepoints
 - [LEGACY](LEGACY): old versions (deprecated)
