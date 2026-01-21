@@ -50,7 +50,7 @@ Example data can be seen in [Process/jokowi_twitterACC](Process/jokowi_twitterAC
     pip install -r requirements.txt
 	```
 
-## Usage
+## Usage`
 The main notebook is [Notebook.IPYNB](Notebook.IPYNB). It contains:
 - The `twitterScrapper` class (imported from [src.py](src.py))
 - Examples of filter configuration
@@ -74,9 +74,11 @@ FILTERS = {
     "these_hashtags": "",            # Example: #whatshappening · contains the hashtag #whatshappening
     
     # Account filters
-    "from_accounts": "",          # Example: from:Twitter · Tweets sent from the account Twitter
-    "to_accounts": "",            # Example: to:Twitter · Tweets sent in reply to the account Twitter
-    "mentioning_accounts": "",    # Example: @Twitter · Tweets that mention the account Twitter
+    "from_accounts": "",           # Example: from:Twitter · Tweets sent from the account Twitter
+    "to_accounts": "",             # Example: to:Twitter · Tweets sent in reply to the account Twitter
+    "mentioning_accounts": "",     # Example: @Twitter · Tweets that mention the account Twitter
+
+    "language": "",                # Example: lang:en · Tweets in English | Use "" for all languages
 
     # Additional filters
     "Minimum_replies": "",         # Example: min_replies:100 · Tweets with at least 100 replies
