@@ -64,12 +64,15 @@ lang_codes = {'Arabic': 'ar',
             'Vietnamese': 'vi'}
 
 def getTime(str: str) -> datetime:
+
     '''
     Convert string of datetime in isoformat to datetime object and adjust the timezone
+
 
     Parameters
     ------------
     - str: str
+
         String of datetime in isoformat
 
     Returns
@@ -77,29 +80,51 @@ def getTime(str: str) -> datetime:
     - date_time_obj: datetime
         Datetime object adjusted to UTC+7
     '''
+
     date_time_obj = datetime.fromisoformat(str)
-    date_time_obj =date_time_obj + timedelta(hours=7)   # Fuckass X timezone needs to be adjusted to UTC+7. Might as well make it adjustable based on user timezone later
+    hour_offset = int(time.strftime("%z", time.gmtime())[:3])                 # Shit code to get ur timezone
+    date_time_obj =date_time_obj + timedelta(hours=hour_offset)
 
     return date_time_obj
 
-def minOneDay(str: str) -> str:
+
+def safelyTurnStrToUnixTime(str: str) -> int:
+    '''
+    This function is used to safely turn a string of datetime in "YYYY-MM-DD-HH:MM:SS" format to unix timestamp
+
+    Parameters
+    ------------
+    - str: str
+        String of datetime in "YYYY-MM-DD-HH:MM:SS" format
+    
+    Returns
+    ------------
+    - int
+        unix timestamp of the given datetime string
+    '''
+    dt = datetime.strptime(str, "%Y-%m-%d-%H:%M:%S")
+    unix_timestamp = int(dt.timestamp())
+    return unix_timestamp
+
+def minOneDay(time: int) -> int:
     '''
     This function is used to subtract one day from the given date
     
     Parameters
     -----------
-    - str: str
-        String of datetime in isoformat
+    - time: int
+        unix timestamp of the date to subtract one day from
 
     Returns
     -----------
-    - str: str
-        String of datetime in isoformat minus one day
+    - int
+        unix timestamp of the date after subtracting one day
     '''
-    str = datetime.strptime(str, "%Y-%m-%d")
-    str = str - timedelta(days=1)
-    str = str.strftime("%Y-%m-%d")
-    return str
+    date_time_obj = datetime.fromtimestamp(time)
+    date_time_obj -= timedelta(days=1)
+    date_time_obj = int(date_time_obj.timestamp())
+    
+    return date_time_obj
 
 def wait(timeout: int = 10) -> None:
     '''
@@ -205,7 +230,7 @@ class twitterScrapper:
         - str
             The constructed search URL.
         '''
-        return f"{self.SEARCH_URL}{self.FILTERS_COMBINATION}{quote(f' until:{date_limit}')}&f=live&src=typed_query"
+        return f"{self.SEARCH_URL}{self.FILTERS_COMBINATION}{quote(f' until_time:{date_limit}')}&f=live&src=typed_query"
 
     def _scrape_detected(self) -> bool:
         '''
@@ -227,7 +252,7 @@ class twitterScrapper:
         except TimeoutException:
             return False
 
-    def _wait_for_posts(self, current_date: str, counter: int) -> tuple[str, int, bool]:
+    def _wait_for_posts(self, current_date: int, counter: int) -> tuple[int, int, bool]:
         '''
         Wait for posts to load on the page. If no posts are found within the timeout period, step back one day and increment the counter.
 
@@ -235,14 +260,14 @@ class twitterScrapper:
 
         Parameters
         ----------
-        - current_date : str
-            The current date being checked in the format "YYYY-MM-DD".
+        - current_date : int
+            unix timestamp representing the current date being checked for posts.
         - counter : int
             The number of consecutive days with no posts found.
         
         Returns
         -------
-        - tuple[str, int, bool]
+        - tuple[int, int, bool]
             A tuple containing the updated current date, the updated counter, and a boolean indicating whether the maximum number of empty pages has been reached.
         '''
 
@@ -256,8 +281,9 @@ class twitterScrapper:
         except TimeoutException:
             current_date = minOneDay(current_date)
             counter += 1
-            print(f"No posts found, stepping back to {current_date}, attempt {counter + 1}/{self.MAX_EMPTY_PAGES}")
-            return current_date, counter, counter > self.MAX_EMPTY_PAGES    # Nothingburger and minus by one day
+            current_date_str = datetime.fromtimestamp(current_date).strftime("%Y-%m-%d")
+            print(f"No posts found, stepping back to {current_date_str}, attempt {counter + 1}/{self.MAX_EMPTY_PAGES}")
+            return current_date, counter, counter >= self.MAX_EMPTY_PAGES    # Nothingburger and minus by one day
 
     def _parse_post(self, post_element) -> str:
         '''
@@ -392,7 +418,7 @@ class twitterScrapper:
                     for d in self.theDict["Date"]
                     if isinstance(d, str)
                 )
-                self.start_date = earliest_dt.strftime("%Y-%m-%d")
+                self.start_date = int(earliest_dt.timestamp())
             except Exception:
                 pass
 
@@ -625,9 +651,13 @@ class twitterScrapper:
 
         # Dates handling
         if startDate == "":
-            startDate = datetime.now().strftime("%Y-%m-%d")
+            startDate = int(datetime.now().timestamp())
+        else:
+            startDate = int(datetime.strptime(startDate, "%Y-%m-%d").timestamp())
         if endDate == "":
-            endDate = "2006-01-01"  # Twitter launch date
+            endDate = int(datetime(2006, 1, 1).timestamp())   # Twitter launch date
+        else:
+            endDate = int(datetime.strptime(endDate, "%Y-%m-%d").timestamp())
         self.start_date = startDate
         self.end_date = endDate
 
@@ -677,6 +707,7 @@ class twitterScrapper:
 
                 # Get the current date upper limit
                 current_date_limit = start_date
+                current_date_limit_str = datetime.fromtimestamp(current_date_limit).strftime("%Y-%m-%d")
 
                 # If all shits been scraped, will save and break
                 if reached_all_posts:
@@ -727,7 +758,8 @@ class twitterScrapper:
                             continue
 
                         # If end date is reached, functional if user specified end_date at self.start()
-                        if self.theDict["Date"] and getTime(self.theDict["Date"][-1]) < getTime(self.end_date):
+    
+                        if self.theDict["Date"] and safelyTurnStrToUnixTime(self.theDict["Date"][-1]) < self.end_date:
                             reached_all_posts = True
                             break
                         
@@ -763,13 +795,13 @@ class twitterScrapper:
 
                     if new_height == last_height:
                         if self.theDict["Date"]:
-                            last_date_only = "-".join(self.theDict["Date"][-1].split("-")[:3])
-                            if getTime(last_date_only) >= getTime(current_date_limit):
+                            last_date_only = safelyTurnStrToUnixTime(self.theDict["Date"][-1])
+                            if last_date_only >= current_date_limit:
                                 start_date = minOneDay(last_date_only)
                             else:
                                 start_date = last_date_only
                         else:
-                            start_date = minOneDay(current_date_limit)
+                            start_date = current_date_limit
 
                         self.start_date = start_date
                         break

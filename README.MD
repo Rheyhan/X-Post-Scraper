@@ -91,6 +91,54 @@ FILTERS = {
 
 On "any_of_these_words", normally it would seperate string with spaces. However, if you don't want the string to be seperated, you can put `\'` in the start and end of the string. E.g, `"any_of_these_words": "\'Makan Bergizi Gratis\' \'MBG\'"` would search for posts that contains either "Makan Bergizi Gratis" or "MBG".
 
+### Language availability
+The following languages are supported for filtering:
+```
+'Arabic'
+'Arabic (Feminine)'
+'Bangla'
+'Basque'
+'Bulgarian
+'Catalan'
+'Croatian'
+'Czech'
+'Danish'
+'Dutch'
+'English'
+'Finnish'
+'French'
+'German'
+'Greek'
+'Gujarati'
+'Hebrew'
+'Hindi'
+'Hungarian'
+'Indonesian'
+'Italian'
+'Japanese'
+'Kannada'
+'Korean'
+'Marathi
+'Norwegian'
+'Persian'
+'Polish'
+'Portuguese'
+'Romanian'
+'Russian'
+'Serbian'
+'Simplified Chinese'
+'Slovak'
+'Spanish'
+'Swedish'
+'Tamil'
+'Thai'
+'Traditional Chinese'
+'Turkish'
+'Ukrainian'
+'Urdu'
+'Vietnamese'
+```
+
 ## Output
 By default, outputs are stored in:
 - [Process](Process) for current runs
